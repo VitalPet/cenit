@@ -20,6 +20,7 @@ gem 'figaro'
 gem 'unicorn', '4.9.0'
 gem 'xmldsig'
 gem 'spreadsheet'
+gem 'peddler'
 
 group :doc do
   gem 'sdoc', require: false
@@ -39,7 +40,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'rails_layout'
   gem 'ffaker'
-  gem 'rubocop'
+#  gem 'rubocop', '0.49.0'
 end
 
 group :test do
@@ -134,3 +135,6 @@ gem 'net-sftp'
 
 gem 'mongoid-tracer', git: 'https://github.com/macarci/mongoid-tracer.git'
 gem 'diffy'
+
+gem 'pdf-forms', '~> 1.1', '>= 1.1.1'
+gem 'combine_pdf', '1.0.4'
