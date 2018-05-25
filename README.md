@@ -196,38 +196,7 @@ If RabbitMQ is correctly installed when you run the rails server you should see:
 
 It uses Figaro gem to manage app configuration using ENV. Any of this variable is required to run a local server but maybe you consider some of them to run in production environment
 
-Then add to `config/application.yml` app configuration:  
-
-```
-# config/application.yml
-
-SHOW_SLACK_BADGE: "true"
-JUPYTER_NOTEBOOKS: "true"
-JUPYTER_NOTEBOOKS_URL: "//{your-cenit-jupyter-notebooks}.herokuapp.com"
-GITHUB_OAUTH_TOKEN: "{GITHUB_OAUTH_TOKEN}"
-DB_PROD: "{DB_PROD}"
-OAUTH_TOKEN_END_POINT: "embedded"
-RELIC_LICENSE_KEY: "{RELIC_LICENSE_KEY}"
-GOOGLE_ANALYTIC_ID: "{GOOGLE_ANALYTIC_ID}"
-PORTAL_URL: 'https://cenit-portal.herokuapp.com'
-DOCS_URL: 'https://cenit-io.github.io'
-API_DOC_URL: 'https://cenit-io.github.io'
-OPEN_ID_CLIENT_ID: "{OPEN_ID_CLIENT_ID}"
-OPEN_ID_CLIENT_SECRET: "{OPEN_ID_CLIENT_SECRET}"
-OPEN_ID_AUTH_URL: "https://cenit.io/app/open_id/sign_in"
-OPEN_ID_REDIRECT_URI: "https://cenit.io/users/sign_in"
-OPEN_ID_TOKEN_URL: "https://cenit.io/app/open_id/sign_in/token"
-EXCLUDED_ACTIONS: simple_share bulk_share simple_cross_share bulk_cross_share build_gem bulk_pull
-RABBITMQ_BIGWIG_TX_URL: "{RABBITMQ_BIGWIG_TX_URL}"
-NOTIFIER_EMAIL: "{NOTIFIER_EMAIL}"
-EXCEPTION_RECIPIENTS: "{List of emails}"
-RABBIT_MQ_USER: "{RABBIT_MQ_USER}"
-RABBIT_MQ_PASSWORD: "{RABBIT_MQ_PASSWORD}"
-
-# AMAZON SIMPLE STORAGE SERVICE.
-AWS_ACCESS_KEY_ID: "{AWSS3 Access ID}"
-AWS_SECRET_ACCESS_KEY: "{AWSS3 Access Key}"
-```
+Then add to `config/application.yml` app configuration as reference review `config/application.example.yml`  
 
 ## Dependencies
 
@@ -453,4 +422,4 @@ Thank you for your contributions:
 [apisDir-link]: https://github.com/APIs-guru/openapi-directory/tree/master/APIs
 [twitterFollow-image]: https://img.shields.io/twitter/follow/cenit_io.svg?style=social
 [twitterFollow-link]: https://twitter.com/intent/follow?screen_name=cenit_io
-[join-slack-link]: https://join.slack.com/t/cenitio/shared_invite/enQtMjc1MTY1NzAxOTEwLTMwODlmNzMyMTNlMmM5YTJhZTFjNzExZmJkMWI5OGFmYjJhNGZlNGIwMWI0Nzg5YzE2YTM4MDI2MmZhYWRlZjg
+[join-slack-link]: https://join.slack.com/t/cenitio/shared_invite/enQtMzY3OTI4MzcyNDA2LTkyMWYyNDc2MjNiYjdlYjliYTcwMzNiZmU2MThlNjM2ZDE1NGU3MjU2NDNiYmIzMmRiMDk3ZGE5YjIwOGUwMmY

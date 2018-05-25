@@ -8,6 +8,7 @@ module RailsAdmin
           weight 810
           navigation_label 'Administration'
           label 'Tenants'
+          navigation_icon 'fa fa-home'
           object_label_method { :label }
 
           visible { User.current.present? }
@@ -29,6 +30,8 @@ module RailsAdmin
           configure :time_zone do
             label 'Time Zone'
           end
+
+          configure :meta, :json_value
 
           show do
             field :name
@@ -55,9 +58,6 @@ module RailsAdmin
               visible { Account.current_super_admin? }
             end
             field :token do
-              visible { Account.current_super_admin? }
-            end
-            field :meta do
               visible { Account.current_super_admin? }
             end
             field :notification_level

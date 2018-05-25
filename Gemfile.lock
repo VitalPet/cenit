@@ -5,6 +5,13 @@ GIT
     cenit-config (0.0.1)
 
 GIT
+  remote: https://github.com/cenit-io/cenit-home.git
+  revision: 6a21dfffebba0c08118c4174ca2668c95a093380
+  specs:
+    cenit-home (0.0.1.alpha)
+      bootstrap-sass
+
+GIT
   remote: https://github.com/cenit-io/cenit-multi_tenancy.git
   revision: 785ceaa35e634b8efe12757060818c97501163a8
   specs:
@@ -60,7 +67,7 @@ GIT
 
 GIT
   remote: https://github.com/macarci/mongoid-tracer.git
-  revision: 3cb2565d9c3c5ca7db39949f7023550c095a0abd
+  revision: bb74b75aa53f573ae42e70035bd7bc5ad8e8642e
   specs:
     mongoid-tracer (0.0.1)
       mongoid (>= 5.0.1)
@@ -129,9 +136,8 @@ GEM
     amq-protocol (2.0.0)
     arel (6.0.4)
     ast (2.3.0)
-    autoprefixer-rails (6.1.0.1)
+    autoprefixer-rails (8.5.0)
       execjs
-      json
     aws-sdk (2.10.13)
       aws-sdk-resources (= 2.10.13)
     aws-sdk-core (2.10.13)
@@ -141,9 +147,9 @@ GEM
       aws-sdk-core (= 2.10.13)
     aws-sigv4 (1.0.1)
     bcrypt (3.1.10)
-    bootstrap-sass (3.3.5.1)
-      autoprefixer-rails (>= 5.0.0.1)
-      sass (>= 3.3.0)
+    bootstrap-sass (3.3.7)
+      autoprefixer-rails (>= 5.2.1)
+      sass (>= 3.3.4)
     bootstrap-wysihtml5-rails (0.3.3.7)
       railties (>= 3.0)
     bson (3.2.6)
@@ -213,7 +219,7 @@ GEM
       term-ansicolor (~> 1.3)
       thor (~> 0.19.1)
       tins (~> 1.6.0)
-    crass (1.0.3)
+    crass (1.0.4)
     daemons (1.2.3)
     database_cleaner (1.5.1)
     deface (1.0.2)
@@ -233,15 +239,16 @@ GEM
       warden (~> 1.2.3)
     diff-lcs (1.2.5)
     diffy (3.2.0)
+    dig_rb (1.0.1)
     docile (1.1.5)
     domain_name (0.5.25)
       unf (>= 0.0.5, < 1.0.0)
-    easy_diff (0.0.6)
     erubis (2.7.0)
     eventmachine (1.0.8)
     exception_notification (4.1.4)
       actionmailer (~> 4.0)
       activesupport (~> 4.0)
+    excon (0.59.0)
     execjs (2.7.0)
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
@@ -251,7 +258,7 @@ GEM
     faraday (0.9.2)
       multipart-post (>= 1.2, < 3)
     ffaker (2.1.0)
-    ffi (1.9.10)
+    ffi (1.9.23)
     figaro (1.1.1)
       thor (~> 0.14)
     font-awesome-rails (4.6.2.0)
@@ -307,6 +314,8 @@ GEM
     jbuilder (2.3.2)
       activesupport (>= 3.0.0, < 5)
       multi_json (~> 1.2)
+    jeff (2.0.0)
+      excon (>= 0.22.1)
     jeweler (2.0.1)
       builder
       bundler (>= 1.0)
@@ -333,10 +342,10 @@ GEM
     kgio (2.10.0)
     language_sniffer (1.0.2)
     libv8 (3.16.14.13)
-    liquid (3.0.6)
+    liquid (4.0.0)
     lodash-rails (4.6.1)
       railties (>= 3.1)
-    loofah (2.1.1)
+    loofah (2.2.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.0)
@@ -355,19 +364,9 @@ GEM
       mongo (~> 2.1)
       origin (~> 2.1)
       tzinfo (>= 0.3.37)
-    mongoid-audit (1.1.0)
-      activesupport
-      glebtv_mongoid_userstamp
-      kaminari
-      mongoid (>= 4.0.0, < 6.0)
-      mongoid-history (~> 0.4.5)
     mongoid-grid_fs (2.2.1)
       mime-types (>= 1.0, < 3.0)
       mongoid (>= 3.0, < 6.0)
-    mongoid-history (0.4.7)
-      activesupport
-      easy_diff
-      mongoid (>= 3.0)
     mongoid-rspec (3.0.0)
       mongoid (~> 5.0)
       rake
@@ -393,12 +392,6 @@ GEM
       rack (~> 1.2)
     octokit (4.1.1)
       sawyer (~> 0.6.0, >= 0.5.3)
-    omniauth (1.2.2)
-      hashie (>= 1.2, < 4)
-      rack (~> 1.0)
-    omniauth-oauth2 (1.3.1)
-      oauth2 (~> 1.0)
-      omniauth (~> 1.2)
     origin (2.1.1)
     orm_adapter (0.5.0)
     parser (2.3.1.4)
@@ -408,6 +401,11 @@ GEM
       cliver (~> 0.3.2)
       safe_shell (>= 1.0.3, < 2.0)
     pdfkit (0.8.2)
+    peddler (1.6.5)
+      dig_rb (~> 1.0)
+      excon (>= 0.50.0)
+      jeff (>= 1.5.2, < 3.0)
+      multi_xml (>= 0.5.0)
     poltergeist (1.7.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -479,6 +477,9 @@ GEM
       thor (>= 0.18.1, < 2.0)
     raindrops (0.15.0)
     rake (12.3.0)
+    rb-fsevent (0.10.3)
+    rb-inotify (0.9.10)
+      ffi (>= 0.5.0, < 2)
     rdoc (4.2.0)
     recaptcha (4.3.1)
       json
@@ -524,7 +525,11 @@ GEM
     rubyzip (1.2.1)
     rufus-scheduler (3.1.9)
     safe_shell (1.1.0)
-    sass (3.4.23)
+    sass (3.5.6)
+      sass-listen (~> 4.0.0)
+    sass-listen (4.0.0)
+      rb-fsevent (~> 0.9, >= 0.9.4)
+      rb-inotify (~> 0.9, >= 0.9.7)
     sass-rails (5.0.4)
       railties (>= 4.0.0, < 5.0)
       sass (~> 3.1)
@@ -628,6 +633,7 @@ DEPENDENCIES
   capybara
   carrierwave-mongoid
   cenit-config!
+  cenit-home!
   cenit-multi_tenancy!
   cenit-oauth!
   cenit-service!
@@ -665,8 +671,6 @@ DEPENDENCIES
   mime
   mini_magick
   mongoid
-  mongoid-audit
-  mongoid-history
   mongoid-rspec
   mongoid-tracer!
   net-scp
@@ -675,12 +679,11 @@ DEPENDENCIES
   oauth
   oauth2 (= 1.0.0)
   octokit
-  omniauth
-  omniauth-oauth2 (~> 1.3.1)
   origami!
   parser
   pdf-forms (~> 1.1, >= 1.1.1)
   pdfkit (= 0.8.2)
+  peddler
   poltergeist
   prawn-qrcode (= 0.2.2.1)
   prawn-rails (= 0.1.1)

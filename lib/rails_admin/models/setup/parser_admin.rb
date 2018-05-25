@@ -11,6 +11,8 @@ module RailsAdmin
             navigation_label 'Transforms'
             navigation_icon 'fa fa-sign-in'
 
+            visible false
+
             wizard_steps do
               steps =
                 {
@@ -102,6 +104,8 @@ module RailsAdmin
               field :style
               field :updated_at
             end
+
+            filter_query_fields :namespace, :name
           end
         end
 

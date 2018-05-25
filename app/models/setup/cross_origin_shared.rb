@@ -10,7 +10,7 @@ module Setup
     TRACING_IGNORE_ATTRIBUTES = [:created_at, :updated_at, :creator_id, :updater_id, :tenant_id, :origin]
 
     included do
-      origins :default, -> { Cenit::MultiTenancy.tenant_model.current && :owner }, :shared
+      origins -> { Cenit::MultiTenancy.tenant_model.current && [:default, :owner] }, :shared
 
       build_in_data_type.excluding(:origin, :tenant)
 
@@ -55,10 +55,11 @@ module Setup
     end
 
     def tenant_version
-      # if version && (pin = Setup::Pin.for(self)) && pin.version < version
-      #   undo nil, from: pin.version + 1, to: version
-      # end
-      self
+      if !Thread.current[:cenit_pins_off] && (pin = Setup::Pin.for(self)) && (trace = pin.trace)
+        trace.target_after_action(self)
+      else
+        self
+      end
     end
 
     def read_attribute(name)
@@ -92,7 +93,9 @@ module Setup
       end
 
       def clear_pins_for(tenant, ids)
-        Setup::Pin.with(tenant).where(model: mongoid_root_class, :record_id.in => ids).delete_all
+        tenant.switch do
+          Setup::Pin.where(target_model_name: mongoid_root_class, :target_id.in => ids).delete_all
+        end
       end
 
       def super_count

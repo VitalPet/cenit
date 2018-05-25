@@ -1,5 +1,6 @@
 require 'net/http'
 require 'identicon'
+require 'mongoid_userstamp'
 
 class User
   include Mongoid::Document
@@ -22,7 +23,7 @@ class User
   # Include default devise modules. Others available are:
   # :lockable, :timeoutable, :rememberable
 
-  devise :trackable, :validatable, :omniauthable, :database_authenticatable, :recoverable
+  devise :trackable, :validatable, :database_authenticatable, :recoverable
   devise :registerable unless ENV['UNABLE_REGISTERABLE'].to_b
   devise :confirmable if ENV.has_key?('UNABLE_CONFIRMABLE') && !ENV['UNABLE_CONFIRMABLE'].to_b
 
@@ -47,11 +48,6 @@ class User
   field :current_sign_in_ip, type: String
   field :last_sign_in_ip, type: String
   field :unconfirmed_email, type: String
-
-  field :doorkeeper_uid, type: String
-  field :doorkeeper_access_token, type: String
-  field :doorkeeper_refresh_token, type: String
-  field :doorkeeper_expires_at, type: Integer
 
   #Profile
   mount_uploader :picture, ImageUploader
@@ -126,28 +122,6 @@ class User
     end
   end
 
-  def self.find_or_initialize_for_doorkeeper_oauth(oauth_data)
-    user = User.where(email: oauth_data.info.email).first
-    user ||= User.new(email: oauth_data.info.email, password: Devise.friendly_token[0, 20])
-    user.confirmed_at ||= Time.now
-    user.doorkeeper_uid = oauth_data.uid
-    user
-  end
-
-  def self.new_with_session(params, session)
-    super.tap do |user|
-      if data = session['devise.doorkeeper_data'] && session['devise.doorkeeper_data']['extra']['raw_info']
-        user.email = data['email'] if user.email.blank?
-      end
-    end
-  end
-
-  def update_doorkeeper_credentials(oauth_data)
-    self.doorkeeper_access_token = oauth_data.credentials.token
-    self.doorkeeper_refresh_token = oauth_data.credentials.refresh_token
-    self.doorkeeper_expires_at = oauth_data.credentials.expires_at
-  end
-
   def method_missing(symbol, *args)
     if (match = symbol.to_s.match(/(.+)\?/))
       has_role?(match[1].to_sym)
@@ -158,6 +132,23 @@ class User
 
   def admin?
     has_role?(:admin) || has_role?(:super_admin)
+  end
+
+  def notification_span_for(type)
+    type = type.to_s.to_sym
+    unless @notification_spans
+      @notification_spans = {}
+      regex = Regexp.new("\\A(#{Setup::SystemNotification.type_enum.join('|')})_notifications_span\\Z")
+      roles.each do |role|
+        next unless (metadata = role.metadata).is_a?(Hash)
+        metadata.each do |key, value|
+          next unless (match = key.to_s.match(regex))
+          t = match[1].to_sym
+          @notification_spans[t] = [@notification_spans[t] || 0, value.to_i].max
+        end
+      end
+    end
+    @notification_spans[type]
   end
 
   class << self

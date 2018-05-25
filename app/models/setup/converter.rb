@@ -1,5 +1,5 @@
 module Setup
-  class Converter < Translator
+  class Converter < LegacyTranslator
     include RailsAdmin::Models::Setup::ConverterAdmin
     include Setup::TranslationCommon::ClassMethods
 
@@ -87,6 +87,7 @@ module Setup
           else
             source.send(sub_map.source)
           end
+        next unless sub_map_source
         transformation = sub_map.transformation
         options = parse_options(sub_map.options)
         target_association = target_data_type.records_model.associations[name]
@@ -161,6 +162,7 @@ module Setup
     end
 
     def mapping=(data)
+      return unless style == 'mapping'
       unless data.is_a?(Hash)
         data =
           if data.is_a?(String)
@@ -171,7 +173,12 @@ module Setup
       end
       if source_data_type && target_data_type
         @mapping = map_model.new_from_json(data)
-        self.map_attributes = @mapping.attributes
+        if @mapping.is_a?(Hash)
+          self.map_attributes = @mapping
+          @mapping = nil
+        else
+          self.map_attributes = @mapping.attributes
+        end
         @lazy_mapping = nil
       else
         @lazy_mapping = data
@@ -276,7 +283,7 @@ module Setup
 
     def share_hash(options = {})
       hash = super
-      if (mapping_id = self.mapping.id).present? && (mapping = hash['mapping'])
+      if style == 'mapping' && (mapping_id = self.mapping.id).present? && (mapping = hash['mapping'])
         hash['mapping'] = { 'id' => mapping_id }.merge(mapping)
       end
       hash
@@ -349,7 +356,7 @@ module Setup
                 source_data_type_id: '__source_data_type_id__',
                 target_data_type_id: target_data_type_id
               },
-              types: types = [Setup::Renderer.to_s],
+              types: types = Setup::Template.concrete_class_hierarchy.collect(:to_s),
               data: { 'template-name': '__source_data_type_id__' }
             },
             options: { type: 'string', default: '' }
@@ -365,11 +372,17 @@ module Setup
           enum_names << source_data_type.custom_title
           enum_options << { data: { 'template-value': source_data_type.id.to_s } }
           source_model = source_data_type.records_model
+          titles = Set.new
           source_model.properties.each do |property|
             property_dt = source_model.property_model(property).data_type
             unless property_dt == source_data_type
               enum << property
-              enum_names << "#{source_data_type.custom_title} | #{(property_dt.schema['title'] || property.to_title)}"
+              title = property_dt.schema['title'] || property.to_title
+              if titles.include?(title)
+                title = "#{title} (#{property.to_title})"
+              end
+              titles << title
+              enum_names << "#{source_data_type.custom_title} | #{title}"
               enum_options << { data: { 'template-value': property_dt.id.to_s } }
             end
           end

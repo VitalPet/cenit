@@ -31,6 +31,7 @@ class Ability
               Setup::Category,
               TourTrack
             ]
+        can [:index, :show, :edit], Setup::Configuration
         can :destroy, [Setup::Storage, Setup::CrossSharedCollection]
         can :simple_delete_data_type, Setup::CenitDataType, origin: :cenit
         can :destroy, Setup::CenitDataType, origin: :tmp
@@ -41,7 +42,6 @@ class Ability
           app_id.app.nil?
         end
         can :inspect, Account
-        can :push, Setup::Collection
 
         can [:simple_cross, :reinstall], Setup::CrossSharedCollection, installed: true
         can :simple_cross, UNCONDITIONAL_ADMIN_CROSSING_MODELS
@@ -238,7 +238,9 @@ class Ability
   ADMIN_CROSSING_MODELS = UNCONDITIONAL_ADMIN_CROSSING_MODELS + [Setup::CrossSharedCollection]
 
   def can?(action, subject, *extra_args)
-    if (action == :simple_cross && crossing_models.exclude?(subject.is_a?(Class) ? subject : subject.class)) ||
+    if action == :json_edit
+      subject.is_a?(Mongoff::Record) && !subject.is_a?(Mongoff::GridFs::File)
+    elsif (action == :simple_cross && crossing_models.exclude?(subject.is_a?(Class) ? subject : subject.class)) ||
       (subject == ScriptExecution && (user.nil? || !user.super_admin?))
       false
     else

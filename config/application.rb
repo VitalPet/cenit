@@ -46,17 +46,15 @@ module Cenit
       puts 'DELETING OLD Consumers'
       RabbitConsumer.delete_all
 
-      Account.all.each do |account|
-        Account.current = account
+      Tenant.all.each do |tenant|
+        tenant.switch do
+          ThreadToken.destroy_all
+          Setup::Task.where(:status.in => Setup::Task::ACTIVE_STATUS).update_all(status: :broken)
+          Setup::Execution.where(:status.nin => Setup::Task::FINISHED_STATUS).update_all(status: :broken, completed_at: Time.now)
 
-        ThreadToken.destroy_all
-        Setup::Task.where(:status.in => Setup::Task::ACTIVE_STATUS).update_all(status: :broken)
-        Setup::Execution.where(:status.nin => Setup::Task::FINISHED_STATUS).update_all(status: :broken, completed_at: Time.now)
-
-        Setup::Application.all.update_all(provider_id: Setup::Oauth2Provider.build_in_provider_id)
+          Setup::Application.all.update_all(provider_id: Setup::Oauth2Provider.build_in_provider_id)
+        end
       end
-
-      Account.current = nil
 
       Cenit::ApplicationParameter.instance_eval do
         include Setup::CenitScoped
@@ -86,9 +84,15 @@ module Cenit
         def tracing?
           self.class.data_type.trace_on_default && super
         end
+
+        def set_association_values(association_name, values)
+          send("#{association_name}=", values)
+        end
       end
 
       Cenit::Notebooks.startup if Cenit.jupyter_notebooks
+
+      Thread.current[:cenit_initializing] = nil
     end
 
     if Rails.env.production? &&
@@ -98,9 +102,9 @@ module Cenit
                                               email: {
                                                 email_prefix: "[Cenit Error #{Rails.env}] ",
                                                 sender_address: %{"notifier" <#{notifier_email}>},
-                                                exception_recipients: exception_recipients.split(',')
+                                                exception_recipients: exception_recipients.split(','),
+                                                sections: %w(tenant request session environment backtrace)
                                               }
-      Thread.current[:cenit_initializing] = nil
     end
 
   end

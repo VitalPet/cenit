@@ -7,12 +7,14 @@ module Mongoid
       include CrossOrigin::CenitDocument
       include RailsAdmin::Models::Mongoid::Tracer::TraceAdmin
 
-      build_in_data_type
+      Setup::Models.regist(self)
+
+      build_in_data_type.including(:created_at)
 
       deny :all
       allow :index, :show, :member_trace_index, :collection_trace_index
 
-      origins :default, -> { Cenit::MultiTenancy.tenant_model.current && :owner }, :shared
+      origins -> { Cenit::MultiTenancy.tenant_model.current && [:default, :owner] }, :shared
 
       def target_model
         if (match = target_model_name.match(/\ADt(.+)\Z/))
@@ -31,20 +33,20 @@ module Mongoid
       end
 
       TRACEABLE_MODELS =
-        # Setup::DataType.class_hierarchy +
-        #   Setup::Validator.class_hierarchy +
-        #   Setup::BaseOauthProvider.class_hierarchy +
-        #   Setup::Translator.class_hierarchy +
-        [
-          Setup::Algorithm
-        # Setup::Connection,
-        # Setup::PlainWebhook,
-        # Setup::Resource,
-        # Setup::Flow,
-        # Setup::Oauth2Scope,
-        # Setup::Snippet,
-        # Setup::RemoteOauthClient
-        ] -
+          #   Setup::Validator.class_hierarchy +
+          #   Setup::BaseOauthProvider.class_hierarchy +
+          #   Setup::Translator.class_hierarchy +
+          [
+            Setup::Algorithm,
+            Setup::Connection,
+            Setup::JsonDataType
+          # Setup::PlainWebhook,
+          # Setup::Resource,
+          # Setup::Flow,
+          # Setup::Oauth2Scope,
+          # Setup::Snippet,
+          # Setup::RemoteOauthClient
+          ] -
           [
             Setup::CenitDataType
           ]

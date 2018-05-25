@@ -7,10 +7,13 @@ module RailsAdmin
         included do
           rails_admin do
             navigation_label 'Workflows'
+            navigation_icon 'fa fa-anchor'
             object_label_method { :custom_title }
             label 'Web-Hook'
 
+            configure :namespace, :enum_edit
             configure :data_type, :contextual_belongs_to
+            configure :active, :toggle_boolean
 
             edit do
               field :namespace

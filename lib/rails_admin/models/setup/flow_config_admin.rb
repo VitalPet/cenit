@@ -7,6 +7,7 @@ module RailsAdmin
         included do
           rails_admin do
             navigation_label 'Configuration'
+            navigation_icon 'fa fa-wrench'
             label 'Flow Config'
             weight 720
             visible true
@@ -17,6 +18,15 @@ module RailsAdmin
                 proc { |scope| scope.and(:id.nin => taken_ids) }
               end
             end
+
+            configure :active, :toggle_boolean
+
+            configure :notify_request, :toggle_boolean
+
+            configure :notify_response, :toggle_boolean
+
+            configure :discard_events, :toggle_boolean
+
             configure :auto_retry do
               help ''
             end

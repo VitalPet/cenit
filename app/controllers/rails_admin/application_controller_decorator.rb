@@ -11,6 +11,8 @@ module RailsAdmin
         model_name = "#{m}::#{model_name}"
       end
       model_name
+    rescue
+      nil
     end
 
     def get_model
@@ -29,7 +31,9 @@ module RailsAdmin
         end
       end
 
-      fail(RailsAdmin::ModelNotFound) if @abstract_model.nil? || (@model_config = @abstract_model.config).excluded?
+      if @abstract_model.nil? || (@model_config = @abstract_model.config).excluded?
+        fail(RailsAdmin::ModelNotFound)
+      end
 
       @dashboard_group_ref =
         if ecommerce_model?
@@ -57,17 +61,40 @@ module RailsAdmin
 
     def get_object
       #Patch
-      if (@object = @abstract_model.get(params[:id]))
-        unless @object.is_a?(Mongoff::Record) || @object.class == @abstract_model.model
-          #Right model context for object
-          @model_config = RailsAdmin::Config.model(@object.class)
-          @abstract_model = @model_config.abstract_model
+      action_class = RailsAdmin::Config::Actions.find(@_action_name.to_sym).class
+      action_class.loading_member do
+        if (@object = @abstract_model.get(params[:id]))
+          unless @object.is_a?(Mongoff::Record) || @object.class == @abstract_model.model
+            #Right model context for object
+            @model_config = RailsAdmin::Config.model(@object.class)
+            @abstract_model = @model_config.abstract_model
+          end
+          @object
+        elsif (model = @abstract_model.model)
+          @object = model.try(:find_by_id, params[:id])
         end
-        @object
-      elsif (model = @abstract_model.model)
-        @object = model.try(:find_by_id, params[:id])
       end
       @object || fail(RailsAdmin::ObjectNotFound)
+    end
+
+    rescue_from RailsAdmin::ObjectNotFound do
+      if _current_user
+        flash[:error] = I18n.t('admin.flash.object_not_found', model: @model_name, id: params[:id])
+        params[:action] = 'index'
+        index
+      else
+        warden.authenticate! scope: :user
+      end
+    end
+
+    rescue_from RailsAdmin::ModelNotFound do
+      if _current_user
+        flash[:error] = I18n.t('admin.flash.model_not_found', model: @model_name)
+        params[:action] = 'dashboard'
+        dashboard
+      else
+        warden.authenticate! scope: :user
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 Cenit::Application.routes.draw do
 
-  devise_for :users, controllers: { omniauth_callbacks: 'users/omniauth_callbacks', sessions: 'sessions' } do
+  devise_for :users, controllers: { sessions: 'sessions' } do
     get 'sign_out', to: 'users/sessions#destroy', as: :destroy_user_session
   end
 
@@ -42,6 +42,7 @@ Cenit::Application.routes.draw do
 
   get 'captcha', to: 'captcha#index'
   get 'captcha/:token', to: 'captcha#index'
+  get '/file/:model/:field/:id', to: 'file#index'
   get '/file/:model/:field/:id/*file(.:format)', to: 'file#index'
 
   namespace :api do

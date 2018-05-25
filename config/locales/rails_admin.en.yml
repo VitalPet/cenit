@@ -61,7 +61,7 @@ en:
         cross_shared_collection: 'eCommerce'
       link_json_data_type: 'Link Object Type'
       link_file_data_type: 'Link File Type'
-      link_cross_shared_collection: 'Connect Store'
+      link_cross_shared_collection: 'Integration'
       and_more: "and %{count} more"
       save_filter: 'Save Filter'
       add: 'Add'
@@ -566,6 +566,10 @@ en:
         title: "Configure"
         menu: "Configure"
         breadcrumb: "Configure"
+      json_edit:
+        title: "JSON Edit"
+        menu: "JSON Edit"
+        breadcrumb: "JSON Edit"
     form:
       flow:
         source_data_type: 'Source data type'
@@ -705,17 +709,6 @@ en:
           end:
             label: 'Add the triggers and save'
             description: 'Please add the triggers and save when done'
-      pin:
-        wizard:
-          model:
-            label: 'Select the model'
-            description: 'Please select the model'
-          record:
-            label: 'Select the record'
-            description: 'Please select the record'
-          version:
-            label: 'Select the version and save'
-            description: 'Please select the version and save'
       observer:
         wizard:
           start:
@@ -724,6 +717,22 @@ en:
           end:
             label: 'Add the triggers and save'
             description: 'Please add the triggers and save when done'
+      tempalte:
+        wizard:
+          start:
+            label: "Select a template content type"
+      template:
+        wizard:
+          start:
+            description: "The template content type is optional"
+          end:
+            label: "Save when done"
+            description: "Save when filled all required fields"
+      mapping_converter:
+        wizard:
+          start:
+            description: "Select source and target data type to build a map"
+            label: "Select source and target data type"
     contact_us:
       tittle: 'Contact us'
       notices:

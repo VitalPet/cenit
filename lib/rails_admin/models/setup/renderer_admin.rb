@@ -10,7 +10,8 @@ module RailsAdmin
             navigation_icon 'fa fa-file-code-o'
             weight 411
             configure :code, :code
-            label 'Template'
+
+            visible false
 
             wizard_steps do
               steps =
@@ -124,6 +125,8 @@ module RailsAdmin
               field :file_extension
               field :updated_at
             end
+
+            filter_query_fields :namespace, :name
           end
         end
 

@@ -1,4 +1,4 @@
-class Class
+class Module
   class << self
 
     def demongoize(object)
@@ -88,6 +88,10 @@ class Hash
   def reverse_array_hash_merge(other)
     other.array_hash_merge(self)
   end
+
+  def www_form_encode
+    URI.encode_www_form(self)
+  end
 end
 
 class String
@@ -167,7 +171,7 @@ class String
       end
     if taken_method && taken.send(taken_method, str)
       i = 1
-      i +=1 while taken.send(taken_method, "#{str}_#{i}")
+      i += 1 while taken.send(taken_method, "#{str}_#{i}")
       "#{str}_#{i}"
     else
       str
@@ -189,6 +193,20 @@ class String
     p.unshift(last)
     p.join(' ')
   end
+
+  def hmac_sha256(key)
+    OpenSSL::HMAC.digest(openssl_digest[:sha256], key.to_s, self)
+  end
+
+  def hmac_hex_sha256(key)
+    OpenSSL::HMAC.hexdigest(openssl_digest[:sha256], key.to_s, self)
+  end
+
+  def openssl_digest
+    @openssl_digest ||= Hash.new { |h, k| h[k] = OpenSSL::Digest.new(k.to_s) }
+  end
+
+  private :openssl_digest
 end
 
 module Enumerable
@@ -230,7 +248,8 @@ end
   Tempfile => :new_tempfile,
   PdfForms => :new_pdfform,
   PdfForms::Fdf => :new_pdf,
-  CombinePDF => :new_pdf
+  CombinePDF => :new_pdf,
+  MWS::Feeds::Client => :new_feed,
 }.each do |entity, method|
   entity.class_eval("def self.#{method}(*args)
     new(*args)
@@ -332,7 +351,10 @@ require 'bson/object_id'
 
 module BSON
   class ObjectId
-    include ::Cenit::Liquidfier
+
+    def to_liquid
+      self
+    end
   end
 end
 

@@ -107,7 +107,7 @@ Cenit.config do
 
   excluded_actions ENV['EXCLUDED_ACTIONS']
 
-  multiple_unicorn_consumers true
+  maximum_unicorn_consumers ENV['MAXIMUM_UNICORN_CONSUMERS'] || 3
 
   min_scheduler_interval 60
 
@@ -121,11 +121,7 @@ Cenit.config do
 
   default_code_theme 'monokai'
 
-  request_timeout 300
-
-  ecommerce_data_types Ecommerce: %w(customer.json product.json inventory.json cart.json order.json shipment.json)
-
-  email_data_type MIME: 'Message'
+  request_timeout ENV['REQUEST_TIMEOUT'] || 300
 
   using_accounts_dbs ENV['USING_ACCOUNTS_DBS']
 
@@ -159,4 +155,12 @@ Cenit.config do
   maximum_task_resumes 500
 
   maximum_cyclic_flow_executions 5
+
+  default_error_notifications_span 1.week
+
+  default_warning_notifications_span 5.days
+
+  default_notice_notifications_span 3.days
+
+  default_info_notifications_span 1.hour
 end

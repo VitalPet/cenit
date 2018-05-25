@@ -1,5 +1,5 @@
 <% options = codemirror_options.to_json %>
-<% flash.discard(:warning)   %>
+<% flash.discard(:warning) %>
 
 <ul class="algorithms nav nav-tabs tabs-left">
   <% algorithm_langs.each do |lang| %>
@@ -16,6 +16,7 @@
         <%= form_tag('#', remote: true) do %>
             <div class="row form-group">
               <label class="col-sm-12 control-label">File <%= lang[:dependencies_file] %>:</label>
+
               <div class="col-sm-12 controls">
                 <input type="hidden" name="lang_id" value="<%= lang[:id] %>">
                 <textarea name="dependencies" required="true" id="dependencies-<%= lang[:id] %>"

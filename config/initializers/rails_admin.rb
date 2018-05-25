@@ -70,7 +70,8 @@ require 'rails_admin/config_decorator'
   RailsAdmin::Config::Actions::Collect,
   RailsAdmin::Config::Actions::MemberTraceIndex,
   RailsAdmin::Config::Actions::CollectionTraceIndex,
-  RailsAdmin::Config::Actions::DataTypeConfig
+  RailsAdmin::Config::Actions::DataTypeConfig,
+  RailsAdmin::Config::Actions::JsonEdit
 ].each { |a| RailsAdmin::Config::Actions.register(a) }
 
 [
@@ -135,15 +136,18 @@ module RailsAdmin
               sublinks: [
                 {
                   param: 'definitions',
-                  label: 'Definitions'
+                  label: 'Definitions',
+                  icon: 'fa fa-puzzle-piece',
                 },
                 {
                   param: 'files',
-                  label: 'Files'
+                  label: 'Files',
+                  icon: 'fa fa-file',
                 },
                 {
                   param: 'objects',
-                  label: 'Objects'
+                  label: 'Objects',
+                  icon: 'fa fa-database',
                 }
               ]
             },
@@ -151,13 +155,13 @@ module RailsAdmin
               param: 'workflows',
               label: 'Workflows',
               icon: 'fa fa-cogs',
-              sublinks: %w(Setup::Notification Setup::Flow Setup::EmailChannel Setup::Observer)
+              sublinks: %w(Setup::Notification Setup::Flow Setup::EmailChannel Setup::Observer Setup::Scheduler)
             },
             {
               param: 'transforms',
               label: 'Transforms',
               icon: 'fa fa-random',
-              sublinks: %w(Setup::Renderer Setup::Parser Setup::Converter Setup::Updater)
+              sublinks: %w(Setup::Template Setup::ParserTransformation Setup::ConverterTransformation Setup::UpdaterTransformation Setup::LegacyTranslator)
             },
             {
               param: 'gateway',
@@ -173,11 +177,8 @@ module RailsAdmin
                 },
                 {
                   param: 'connectors',
-                  label: 'Connectors'
-                },
-                {
-                  param: 'security',
-                  label: 'Security'
+                  label: 'Connectors',
+                  icon: 'fa fa fa-plug'
                 }
               ]
             },
@@ -200,25 +201,9 @@ module RailsAdmin
               label: 'Security',
               icon: 'fa fa-shield',
               externals: [],
-              sublinks: %w(Setup::RemoteOauthClient Setup::OauthProvider Setup::Oauth2Provider)
+              sublinks: %w(Setup::RemoteOauthClient Setup::BaseOauthProvider Setup::Oauth2Scope Setup::Authorization Cenit::OauthAccessGrant )
             }
           ]
-          ecommerce_models = []
-          Cenit.ecommerce_data_types.each do |ns, names|
-            names.each do |name|
-              if (data_type = Setup::DataType.where(namespace: ns, name: name).first)
-                ecommerce_models << data_type.data_type_name
-              end
-            end
-          end
-          if ecommerce_models.present?
-            @dashboard_groups << {
-              param: 'ecommerce',
-              label: 'Ecommerce',
-              icon: 'fa fa-shopping-cart',
-              sublinks: ecommerce_models
-            }
-          end
           @dashboard_groups.select { |g| g[:param] == 'compute' }.each do |g|
             nb= 'Setup::Notebook'
             sublinks = g[:sublinks]
@@ -228,8 +213,42 @@ module RailsAdmin
               end
             end
           end
+
+          if ENV['SUBSCRIPTIONS_APP'].present?
+            @dashboard_groups << {
+              link: { rel: "app/#{ENV['SUBSCRIPTIONS_APP']}/subscriptions" },
+              label: 'Subscriptions',
+              icon: 'fa fa-usd',
+              sublinks: [
+                {
+                  link: { rel: "app/#{ENV['SUBSCRIPTIONS_APP']}/customers" },
+                  label: 'Customers',
+                  icon: 'fa fa-vcard',
+                },
+                {
+                  link: { rel: "app/#{ENV['SUBSCRIPTIONS_APP']}/plans" },
+                  label: 'Plans',
+                  icon: 'fa fa-tasks',
+                }
+              ]
+            }
+          end
+
         end
-        @dashboard_groups
+        ecommerce_models = []
+        Setup::Configuration.ecommerce_data_types.each do |data_type|
+          ecommerce_models << data_type.data_type_name
+        end
+        if ecommerce_models.present?
+          @dashboard_groups + [{
+            param: 'ecommerce',
+            label: 'eCommerce',
+            icon: 'fa fa-shopping-cart',
+            sublinks: ecommerce_models
+          }]
+        else
+          @dashboard_groups
+        end
       end
     end
   end
@@ -378,6 +397,38 @@ RailsAdmin.config do |config|
 
   Setup::Translator
 
+  Setup::Template
+
+  Setup::ErbTemplate
+
+  Setup::HandlebarsTemplate
+
+  Setup::LiquidTemplate
+
+  Setup::PrawnTemplate
+
+  Setup::RubyTemplate
+
+  Setup::XsltTemplate
+
+  Setup::ConverterTransformation
+
+  Setup::LiquidConverter
+
+  Setup::HandlebarsConverter
+
+  Setup::XsltConverter
+
+  Setup::RubyConverter
+
+  Setup::MappingConverter
+
+  Setup::UpdaterTransformation
+
+  Setup::RubyUpdater
+
+  Setup::LegacyTranslator
+
   Setup::Renderer
 
   Setup::Parser
@@ -496,6 +547,8 @@ RailsAdmin.config do |config|
 
   config.navigation 'Administration', icon: 'fa fa-user-secret'
 
+  Setup::Configuration
+
   User
 
   Account
@@ -534,7 +587,7 @@ RailsAdmin.config do |config|
     link_data_type
     index # mandatory
     swagger { only [Setup::ApiSpec] }
-    new
+    new { except Setup::LegacyTranslator.class_hierarchy }
     filters
     data_events
     notifications
@@ -553,6 +606,7 @@ RailsAdmin.config do |config|
     run
     run_script
     edit
+    json_edit
     configure
     play
     copy

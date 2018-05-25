@@ -2,6 +2,21 @@ module RailsAdmin
   module Config
     Model.class_eval do
 
+      def hide_on_navigation
+        visible false
+        child_visible true
+      end
+
+      register_instance_option :child_visible? do
+        visible
+      end
+
+      register_instance_option :json_formatter do
+        proc do |entries, options|
+          entries.to_json(options)
+        end
+      end
+
       register_instance_option :api_path do
         nil
       end
@@ -67,7 +82,7 @@ module RailsAdmin
       register_instance_option :group_visible do
         (controller = (bindings && bindings[:controller])).nil? ||
           ((model_config = controller.instance_variable_get(:@model_config)) && model_config.navigation_label == navigation_label) ||
-          ((g = controller.params[:group]) && dashboard_group_path.include?(g))
+          ((g = controller.params[:group] || controller.instance_variable_get(:@dashboard_group_ref)) && dashboard_group_path.include?(g))
       end
 
       register_instance_option :visible do

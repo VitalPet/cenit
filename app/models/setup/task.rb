@@ -6,7 +6,7 @@ module Setup
     include FieldsInspection
     include RailsAdmin::Models::Setup::TaskAdmin
 
-    origins :default, -> { Account.current_super_admin? ? :admin : nil }
+    origins :default, -> { User.current_super_admin? ? :admin : nil }
 
     STATUS = [:pending, :running, :failed, :completed, :retrying, :broken, :unscheduled, :paused]
     ACTIVE_STATUS = [:running, :retrying]
@@ -110,6 +110,14 @@ module Setup
       self.current_execution = Setup::Execution.create(task: self)
       save
       current_execution
+    end
+
+    def queue_execution
+      if current_execution && current_execution.status == :pending
+        current_execution
+      else
+        new_execution
+      end
     end
 
     def execute(options = {})
@@ -264,7 +272,11 @@ module Setup
     end
 
     def agent_id
-      (agent = send(self.class.agent_field || :itself)) && agent.id
+      (agent = self.agent) && agent.id
+    end
+
+    def agent
+      send(self.class.agent_field || :itself)
     end
 
     def agent_model

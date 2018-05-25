@@ -61,9 +61,17 @@ module Setup
           end
         end
       end
+      [:parameters, :template_parameters].each do |param|
+        if (params = auth_data[param]).is_a?(Hash)
+          association = auth.send(param)
+          params.each do |key, value|
+            association.new(key: key, value: value)
+          end
+        end
+      end
       auth.save!
       auth
     end
-    
+
   end
 end

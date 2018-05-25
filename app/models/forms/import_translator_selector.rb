@@ -14,12 +14,13 @@ module Forms
       register_instance_option(:discard_submit_buttons) { true }
       edit do
         field :translator do
-          inline_edit false
-          inline_add false
-          associated_collection_scope do
-            limit = (associated_collection_cache_all ? nil : 30)
-            data_type = bindings[:object].try(:data_type)
-            Proc.new { |scope| scope.any_in(target_data_type: [nil, data_type]).and(type: :Import).limit(limit) }
+          contextual_association_scope do
+            proc { |scope| scope.and(:_type.in => [Setup::Parser, Setup::ParserTransformation.concrete_class_hierarchy].flatten.collect(&:to_s)) }
+          end
+          contextual_params do
+            if (dt = bindings[:object].data_type)
+              { target_data_type_id: [nil, dt.id] }
+            end
           end
         end
 

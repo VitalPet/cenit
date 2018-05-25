@@ -2,6 +2,15 @@ module RailsAdmin
   module Config
     module Actions
       Edit.class_eval do
+
+        def self.loading_member
+          Thread.current[:cenit_pins_off] = true
+          yield
+        ensure
+          Thread.current[:cenit_pins_off] = nil
+        end
+
+
         register_instance_option :controller do
           proc do
 
@@ -39,7 +48,14 @@ module RailsAdmin
               if (model = @abstract_model.model).is_a?(Class) && model < FieldsInspection
                 save_options[:inspect_fields] = Account.current.nil? || !Account.current_super_admin?
               end
-              if @object.save(save_options)
+              ok =
+                begin
+                  @object.save(save_options)
+                rescue Exception => ex
+                  @object.errors.add(:base, "Error while updating: #{ex.message}")
+                  false
+                end
+              if ok
                 if (warnings = @object.try(:warnings)).present?
                   do_flash(:warning, 'Warning', warnings)
                 end
